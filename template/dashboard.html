@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <h1>Role: {{role}}</h1>
+    {% if role != 'Administrator' %}
+        <h1>Class Taught: {{class_taught}}</h1>
+        <h1>Subject Taught: {{subject_taught}}</h1>
+    {% endif %}
+
+
+    <p>Total Students: {{total_students}}</p>
+    <p>Total Teachers: {{total_teachers}}</p>
+    <p>Total Grade Level: {{total_grade_levels}}</p>
+    <p>Current Academic Year: {{current_academic_year}}</p>
+    <p>Current Term: {{current_term.name}}</p>
+
+    
+   
+{% endblock %}
