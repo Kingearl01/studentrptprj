@@ -56,10 +56,24 @@ class Term(models.Model):
 # --- Grade Levels and Subjects ---
 class GradeLevel(models.Model):
     LEVEL_CHOICES = [
-        ('Nursery', 'Nursery'),
-        ('Lower Primary', 'Lower Primary'),
-        ('Upper Primary', 'Upper Primary'),
-        ('JHS', 'JHS'),
+        ('KG 1A', 'KG 1A'),
+        ('KG 1B', 'KG 1B'), # Added KG1 and KG2
+        ('KG 2A', 'KG 2A'),
+        ('KG 2B', 'KG 2B'),
+        ('Grade 1A', 'Grade 1A'), # Added Grade 1A and Grade 1B
+        ('Grade 1B', 'Grade 1B'),
+        ('Grade 2A', 'Grade 2A'),
+        ('Grade 2B', 'Grade 2B'),
+        ('Grade 3A', 'Grade 3A'),
+        ('Grade 3B', 'Grade 3B'),
+        ('Grade 4A', 'Grade 4A'),
+        ('Grade 4A', 'Grade 4A'),
+        ('Grade 5A', 'Grade 5A'),
+        ('Grade 5B', 'Grade 5B'),
+        ('Grade 6', 'Grade 6'),
+        ('JHS 1', 'JHS 1'),
+        ('JHS 2', 'JHS 2'),
+        ('JHS 3', 'JHS 3'),
     ]
     name = models.CharField(max_length=50, unique=True, choices=LEVEL_CHOICES)
     # Potentially add a numerical order for sorting if needed

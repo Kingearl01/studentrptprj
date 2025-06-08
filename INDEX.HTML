@@ -1,0 +1,1152 @@
+<!-- report_card_app/templates/base.html (No major changes here, navigation will reflect new classroom URL) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Report Card System{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        .btn-secondary {
+            background-color: #6b7280;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+        .btn-danger {
+            background-color: #ef4444;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        .alert {
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+        }
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #34d399;
+        }
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        .alert-warning {
+            background-color: #fffbeb;
+            color: #92400e;
+            border: 1px solid #fbbf24;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        tr:nth-child(even) {
+            background-color: #f3f4f6;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4b5563;
+        }
+        .form-control, .form-select {
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #3b82f6;
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        .form-input-file {
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container flex justify-between items-center">
+            <a href="{% url 'dashboard' %}" class="text-2xl font-bold">Report Card System</a>
+            <div class="space-x-4">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="hover:text-blue-200">Dashboard</a>
+                    <a href="{% url 'student_list' %}" class="hover:text-blue-200">Students</a>
+                    <a href="{% url 'classroom_list' %}" class="hover:text-blue-200">Classrooms</a> {# Changed from grade_level_list #}
+                    <a href="{% url 'score_entry' %}" class="hover:text-blue-200">Enter Scores</a>
+                    <a href="{% url 'bulk_score_upload' %}" class="hover:text-blue-200">Bulk Upload</a>
+                    <a href="{% url 'logout' %}" class="hover:text-blue-200">Logout ({{ user.username }})</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="hover:text-blue-200">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mt-4">
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-error{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-gray-800 text-white p-4 mt-8">
+        <div class="container text-center">
+            &copy; {% now "Y" %} Student Report Card System. All rights reserved.
+        </div>
+    </footer>
+</body>
+</html>
+
+<!-- report_card_app/templates/registration/login.html (No change) -->
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-screen -mt-16">
+    <div class="card w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Login</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="{{ form.username.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Username:</label>
+                {{ form.username }}
+            </div>
+            <div class="mb-6">
+                <label for="{{ form.password.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
+                {{ form.password }}
+            </div>
+            <button type="submit" class="btn btn-primary w-full py-2">Login</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+<!-- report_card_app/templates/dashboard.html (Updated to reflect Classroom) -->
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="card p-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
+    <p class="text-lg text-gray-600 mb-4">Your role: <span class="font-semibold text-blue-700">{{ role }}</span></p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        {% if role == 'Administrator' %}
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">School Overview</h3>
+                <p class="text-gray-600">Total Students: <span class="font-bold">{{ total_students }}</span></p>
+                <p class="text-gray-600">Total Teachers: <span class="font-bold">{{ total_teachers }}</span></p>
+                <p class="text-gray-600">Total Classrooms: <span class="font-bold">{{ total_classrooms }}</span></p> {# Changed #}
+                <p class="text-gray-600">Current Academic Year: <span class="font-bold">{{ current_academic_year.year|default:"N/A" }}</span></p>
+                <p class="text-gray-600">Current Term: <span class="font-bold">{{ current_term.name|default:"N/A" }}</span></p>
+                <a href="{% url 'student_list' %}" class="btn btn-primary mt-4">Manage Students</a>
+            </div>
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">Data Management</h3>
+                <p class="text-gray-600">Quick access to key data entry points.</p>
+                <a href="{% url 'score_entry' %}" class="btn btn-primary mt-4 mr-2">Enter Scores</a>
+                <a href="{% url 'bulk_score_upload' %}" class="btn btn-secondary mt-4">Bulk Upload Scores</a>
+            </div>
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">Reports</h3>
+                <p class="text-gray-600">Generate individual or class report cards.</p>
+                <a href="{% url 'classroom_list' %}" class="btn btn-primary mt-4">Generate Class Reports</a> {# Changed #}
+            </div>
+        {% elif role == 'Class Teacher' %}
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">Your Classroom</h3> {# Changed #}
+                <p class="text-gray-600">Classroom: <span class="font-bold">{{ classroom_assigned.grade_level.name }} {{ classroom_assigned.name }} ({{ classroom_assigned.academic_year.year }})</span></p> {# Changed #}
+                <p class="text-gray-600">Students in Classroom: <span class="font-bold">{{ students_in_classroom|default:"0" }}</span></p> {# Changed #}
+                {% if classroom_assigned %} {# Changed #}
+                    <a href="{% url 'student_list' %}" class="btn btn-primary mt-4">View Your Students</a>
+                {% endif %}
+            </div>
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">Score Entry</h3>
+                <p class="text-gray-600">Enter and edit scores for your classroom.</p> {# Changed #}
+                {% if classroom_assigned %} {# Changed #}
+                    <a href="{% url 'class_score_entry_bulk' classroom_id=classroom_assigned.id %}" class="btn btn-primary mt-4">Enter Classroom Scores</a> {# Changed #}
+                {% else %}
+                    <button class="btn btn-secondary mt-4 cursor-not-allowed" disabled>Assign Classroom First</button> {# Changed #}
+                {% endif %}
+            </div>
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">Report Card Actions</h3>
+                <p class="text-gray-600">Generate reports for your students.</p>
+                {% if classroom_assigned %} {# Changed #}
+                    <a href="{% url 'classroom_list' %}" class="btn btn-primary mt-4">Generate Classroom Report</a> {# Changed #}
+                {% else %}
+                    <button class="btn btn-secondary mt-4 cursor-not-allowed" disabled>Assign Classroom First</button> {# Changed #}
+                {% endif %}
+            </div>
+        {% elif role == 'Subject Teacher' %}
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">Subjects You Teach</h3>
+                <ul class="list-disc list-inside text-gray-600">
+                    {% for subject in subjects_taught %}
+                        <li>{{ subject.name }}</li>
+                    {% empty %}
+                        <li>No subjects assigned.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">Score Entry</h3>
+                <p class="text-gray-600">Enter and edit scores for your subjects.</p>
+                <a href="{% url 'score_entry' %}" class="btn btn-primary mt-4">Enter Subject Scores</a>
+            </div>
+        {% else %}
+            <div class="card col-span-full text-center">
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">No Role Assigned</h3>
+                <p class="text-gray-600">Please contact the administrator to get a role assigned.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+<!-- report_card_app/templates/student_list.html (Updated to reflect Classroom) -->
+{% extends 'base.html' %}
+
+{% block title %}Student List{% endblock %}
+
+{% block content %}
+<div class="card p-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Student List</h1>
+
+    {% if students %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg shadow-md">
+            <thead>
+                <tr>
+                    <th class="py-3 px-4 border-b-2 border-gray-200">Student ID</th>
+                    <th class="py-3 px-4 border-b-2 border-gray-200">Name</th>
+                    <th class="py-3 px-4 border-b-2 border-gray-200">Grade Level</th> {# Display Grade Level for clarity #}
+                    <th class="py-3 px-4 border-b-2 border-gray-200">Classroom</th> {# New #}
+                    <th class="py-3 px-4 border-b-2 border-gray-200">Gender</th>
+                    <th class="py-3 px-4 border-b-2 border-gray-200">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td class="py-3 px-4 border-b border-gray-200">{{ student.student_id }}</td>
+                    <td class="py-3 px-4 border-b border-gray-200">{{ student.full_name }}</td>
+                    <td class="py-3 px-4 border-b border-gray-200">{{ student.classroom.grade_level.name }}</td> {# Changed #}
+                    <td class="py-3 px-4 border-b border-gray-200">{{ student.classroom.name }}</td> {# New #}
+                    <td class="py-3 px-4 border-b border-gray-200">{{ student.gender }}</td>
+                    <td class="py-3 px-4 border-b border-gray-200">
+                        <a href="{% url 'student_detail' student.id %}" class="btn btn-primary btn-sm">View Details</a>
+                        {% if is_admin or (is_class_teacher and user.teacher_profile.class_teacher_of == student.classroom) %} {# Changed #}
+                            <a href="{% url 'add_edit_report_card_remarks' student.id %}" class="btn btn-secondary btn-sm ml-2">Add/Edit Remarks</a>
+                            <a href="{% url 'generate_individual_report_card' student.id current_term.id %}" class="btn btn-danger btn-sm ml-2" target="_blank">Generate Report</a> {# Changed URL #}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="text-gray-600">No students found.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+<!-- report_card_app/templates/student_detail.html (Updated to reflect Classroom) -->
+{% extends 'base.html' %}
+
+{% block title %}{{ student.full_name }} Details{% endblock %}
+
+{% block content %}
+<div class="card p-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">{{ student.full_name }} ({{ student.student_id }})</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+            <h2 class="text-xl font-semibold mb-2 text-gray-700">Student Information</h2>
+            <p><strong>Grade Level:</strong> {{ student.classroom.grade_level.name }}</p> {# Changed #}
+            <p><strong>Classroom:</strong> {{ student.classroom.name }}</p> {# New #}
+            <p><strong>Academic Year:</strong> {{ student.classroom.academic_year.year }}</p> {# Changed #}
+            <p><strong>Gender:</strong> {{ student.gender }}</p>
+            {% if student.student_image %}
+                <div class="mt-4">
+                    <img src="{{ student.student_image.url }}" alt="{{ student.full_name }}'s Image" class="w-32 h-32 object-cover rounded-md shadow-sm">
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            <h2 class="text-xl font-semibold mb-2 text-gray-700">Current Term Scores ({{ current_term.name }})</h2>
+            {% if scores %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg shadow-md">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-3">Subject</th>
+                            <th class="py-2 px-3">Class (50%)</th>
+                            <th class="py-2 px-3">Exam (50%)</th>
+                            <th class="py-2 px-3">Total</th>
+                            <th class="py-2 px-3">Grade</th>
+                            <th class="py-2 px-3">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for score in scores %}
+                        <tr>
+                            <td class="py-2 px-3">{{ score.subject.name }}</td>
+                            <td class="py-2 px-3">{{ score.class_score }}</td>
+                            <td class="py-2 px-3">{{ score.exam_score }}</td>
+                            <td class="py-2 px-3 font-semibold">{{ score.total_score }}</td>
+                            <td class="py-2 px-3">{{ score.grade }}</td>
+                            <td class="py-2 px-3">{{ score.remarks }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <p>No scores available for the current term.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-6">
+        <h2 class="text-xl font-semibold mb-2 text-gray-700">Report Card Remarks</h2>
+        {% if remarks %}
+            <p><strong>Attendance (Days Present):</strong> {{ remarks.attendance_days_present|default:"N/A" }}</p>
+            <p><strong>Attendance (Days Absent):</strong> {{ remarks.attendance_days_absent|default:"N/A" }}</p>
+            <p><strong>Talent and Interest:</strong> {{ remarks.talent_and_interest|default:"N/A" }}</p>
+            <p><strong>Class Teacher Remarks:</strong> {{ remarks.class_teacher_remarks|default:"N/A" }}</p>
+            <p><strong>Headteacher Remarks:</strong> {{ remarks.headteacher_remarks|default:"N/A" }}</p>
+            <p><strong>Class Teacher Name:</strong> {{ remarks.class_teacher_signature.user.get_full_name|default:"N/A" }}</p>
+            <p><strong>Headteacher Name:</strong> {{ remarks.headteacher_signature.user.get_full_name|default:"N/A" }}</p>
+        {% else %}
+            <p>No remarks available for the current term.</p>
+        {% endif %}
+        {% if is_admin or (is_class_teacher and user.teacher_profile.class_teacher_of == student.classroom) %} {# Changed #}
+            <a href="{% url 'add_edit_report_card_remarks' student.id %}" class="btn btn-primary mt-4">Add/Edit Remarks</a>
+        {% endif %}
+    </div>
+
+    <div class="mt-6">
+        <h2 class="text-xl font-semibold mb-2 text-gray-700">Actions</h2>
+        <a href="{% url 'generate_individual_report_card' student.id current_term.id %}" class="btn btn-primary mr-2" target="_blank">Generate Report Card (PDF)</a> {# Changed URL #}
+        <a href="{% url 'student_list' %}" class="btn btn-secondary">Back to Student List</a>
+    </div>
+</div>
+{% endblock %}
+
+<!-- report_card_app/templates/classroom_list.html (New file, replaces grade_level_list.html) -->
+{% extends 'base.html' %}
+
+{% block title %}Classroom List{% endblock %}
+
+{% block content %}
+<div class="card p-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Classrooms ({{ current_academic_year.year }})</h1>
+
+    {% if classrooms %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg shadow-md">
+            <thead>
+                <tr>
+                    <th class="py-3 px-4 border-b-2 border-gray-200">Grade Level</th>
+                    <th class="py-3 px-4 border-b-2 border-gray-200">Classroom Name</th>
+                    <th class="py-3 px-4 border-b-2 border-gray-200">Academic Year</th>
+                    <th class="py-3 px-4 border-b-2 border-gray-200">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for classroom in classrooms %}
+                <tr>
+                    <td class="py-3 px-4 border-b border-gray-200">{{ classroom.grade_level.name }}</td>
+                    <td class="py-3 px-4 border-b border-gray-200">{{ classroom.name }}</td>
+                    <td class="py-3 px-4 border-b border-gray-200">{{ classroom.academic_year.year }}</td>
+                    <td class="py-3 px-4 border-b border-gray-200">
+                        {% if is_admin or (is_class_teacher and user.teacher_profile.class_teacher_of == classroom) %} {# Changed #}
+                            <a href="{% url 'class_score_entry_bulk' classroom.id %}" class="btn btn-primary btn-sm">Enter Classroom Scores</a> {# Changed URL #}
+                            <a href="{% url 'generate_class_report_card' classroom.id current_term.id %}" class="btn btn-secondary btn-sm ml-2" target="_blank">Generate Class Report Cards (PDF)</a> {# Changed URL #}
+                        {% else %}
+                            <span class="text-gray-500">No actions available</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="text-gray-600">No classrooms found for the current academic year.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+<!-- report_card_app/templates/score_entry_admin.html (Updated to reflect Classroom) -->
+{% extends 'base.html' %}
+
+{% block title %}Admin Score Entry{% endblock %}
+
+{% block content %}
+<div class="card p-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Admin Score Entry</h1>
+    <p class="text-gray-600 mb-4">Current Academic Year: <span class="font-semibold">{{ current_academic_year.year }}</span>, Current Term: <span class="font-semibold">{{ current_term.name }}</span></p>
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group">
+                <label for="{{ form.student.id_for_label }}">Student:</label>
+                {{ form.student }}
+                {% if form.student.errors %}<p class="text-red-500 text-sm mt-1">{{ form.student.errors }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.subject.id_for_label }}">Subject:</label>
+                {{ form.subject }}
+                {% if form.subject.errors %}<p class="text-red-500 text-sm mt-1">{{ form.subject.errors }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group">
+                <label for="{{ form.class_score.id_for_label }}">Class Score (50%):</label>
+                {{ form.class_score }}
+                {% if form.class_score.errors %}<p class="text-red-500 text-sm mt-1">{{ form.class_score.errors }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.exam_score.id_for_label }}">Exam Score (50%):</label>
+                {{ form.exam_score }}
+                {% if form.exam_score.errors %}<p class="text-red-500 text-sm mt-1">{{ form.exam_score.errors }}</p>{% endif %}
+            </div>
+        </div>
+        <!-- Hidden field for term -->
+        {{ form.term.as_hidden }}
+
+        <button type="submit" class="btn btn-primary py-2 px-4">Save Score</button>
+    </form>
+</div>
+{% endblock %}
+
+<!-- report_card_app/templates/score_entry_class_teacher.html (Updated to reflect Classroom) -->
+{% extends 'base.html' %}
+
+{% block title %}Class Teacher Score Entry{% endblock %}
+
+{% block content %}
+<div class="card p-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Class Teacher Score Entry</h1>
+    <p class="text-gray-600 mb-4">
+        Classroom: <span class="font-semibold">{{ classroom.grade_level.name }} {{ classroom.name }} ({{ classroom.academic_year.year }})</span> | {# Changed #}
+        Term: <span class="font-semibold">{{ current_term.name }}</span>
+    </p>
+
+    <p class="text-gray-600 mb-4">
+        Use this page to enter individual scores. For bulk editing of all students in your class,
+        please use the <a href="{% url 'class_score_entry_bulk' classroom.id %}" class="text-blue-600 hover:underline">Bulk Classroom Score Entry</a> page. {# Changed URL #}
+    </p>
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group">
+                <label for="{{ form.student.id_for_label }}">Student:</label>
+                {{ form.student }}
+                {% if form.student.errors %}<p class="text-red-500 text-sm mt-1">{{ form.student.errors }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.subject.id_for_label }}">Subject:</label>
+                {{ form.subject }}
+                {% if form.subject.errors %}<p class="text-red-500 text-sm mt-1">{{ form.subject.errors }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group">
+                <label for="{{ form.class_score.id_for_label }}">Class Score (50%):</label>
+                {{ form.class_score }}
+                {% if form.class_score.errors %}<p class="text-red-500 text-sm mt-1">{{ form.class_score.errors }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.exam_score.id_for_label }}">Exam Score (50%):</label>
+                {{ form.exam_score }}
+                {% if form.exam_score.errors %}<p class="text-red-500 text-sm mt-1">{{ form.exam_score.errors }}</p>{% endif %}
+            </div>
+        </div>
+        <!-- Hidden field for term -->
+        {{ form.term.as_hidden }}
+
+        <button type="submit" class="btn btn-primary py-2 px-4">Save Score</button>
+    </form>
+</div>
+{% endblock %}
+
+<!-- report_card_app/templates/score_entry_subject_teacher.html (Updated to reflect Classroom) -->
+{% extends 'base.html' %}
+
+{% block title %}Subject Teacher Score Entry{% endblock %}
+
+{% block content %}
+<div class="card p-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Subject Teacher Score Entry</h1>
+    <p class="text-gray-600 mb-4">Current Academic Year: <span class="font-semibold">{{ current_academic_year.year }}</span>, Current Term: <span class="font-semibold">{{ current_term.name }}</span></p>
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group">
+                <label for="{{ form.student.id_for_label }}">Student:</label>
+                {{ form.student }}
+                {% if form.student.errors %}<p class="text-red-500 text-sm mt-1">{{ form.student.errors }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.subject.id_for_label }}">Subject:</label>
+                {{ form.subject }}
+                {% if form.subject.errors %}<p class="text-red-500 text-sm mt-1">{{ form.subject.errors }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group">
+                <label for="{{ form.class_score.id_for_label }}">Class Score (50%):</label>
+                {{ form.class_score }}
+                {% if form.class_score.errors %}<p class="text-red-500 text-sm mt-1">{{ form.class_score.errors }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.exam_score.id_for_label }}">Exam Score (50%):</label>
+                {{ form.exam_score }}
+                {% if form.exam_score.errors %}<p class="text-red-500 text-sm mt-1">{{ form.exam_score.errors }}</p>{% endif %}
+            </div>
+        </div>
+        <!-- Hidden field for term -->
+        {{ form.term.as_hidden }}
+
+        <button type="submit" class="btn btn-primary py-2 px-4">Save Score</button>
+    </form>
+</div>
+{% endblock %}
+
+<!-- report_card_app/templates/class_score_entry_bulk.html (Updated to reflect Classroom) -->
+{% extends 'base.html' %}
+
+{% block title %}Bulk Classroom Score Entry - {{ classroom.grade_level.name }} {{ classroom.name }}{% endblock %} {# Changed #}
+
+{% block content %}
+<div class="card p-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Bulk Score Entry for {{ classroom.grade_level.name }} {{ classroom.name }}</h1> {# Changed #}
+    <p class="text-gray-600 mb-4">
+        Academic Year: <span class="font-semibold">{{ current_academic_year.year }}</span> |
+        Term: <span class="font-semibold">{{ current_term.name }}</span>
+    </p>
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white rounded-lg shadow-md">
+                <thead>
+                    <tr>
+                        <th class="py-3 px-4 border-b-2 border-gray-200">Student Name</th>
+                        {% for subject in subjects_for_grade %}
+                            <th colspan="2" class="py-3 px-4 border-b-2 border-gray-200 text-center">{{ subject.name }}</th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th class="py-3 px-4 border-b-2 border-gray-200"></th>
+                        {% for subject in subjects_for_grade %}
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-center">Class (50%)</th>
+                            <th class="py-3 px-4 border-b-2 border-gray-200 text-center">Exam (50%)</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students_in_class %}
+                    <tr>
+                        <td class="py-3 px-4 border-b border-gray-200 font-semibold">{{ student.full_name }}</td>
+                        {% for subject in subjects_for_grade %}
+                            {% for form_data in forms_data %}
+                                {% if form_data.student == student and form_data.subject == subject %}
+                                    <td class="py-3 px-4 border-b border-gray-200">
+                                        {{ form_data.form.class_score }}
+                                    </td>
+                                    <td class="py-3 px-4 border-b border-gray-200">
+                                        {{ form_data.form.exam_score }}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <button type="submit" class="btn btn-primary py-2 px-4 mt-6">Save All Scores</button>
+    </form>
+</div>
+{% endblock %}
+
+
+<!-- report_card_app/templates/bulk_score_upload.html (No major changes) -->
+{% extends 'base.html' %}
+
+{% block title %}Bulk Score Upload{% endblock %}
+
+{% block content %}
+<div class="card p-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Bulk Score Upload</h1>
+    <p class="text-gray-600 mb-4">
+        Current Academic Year: <span class="font-semibold">{{ current_academic_year.year }}</span> |
+        Current Term: <span class="font-semibold">{{ current_term.name }}</span>
+    </p>
+    <p class="text-gray-600 mb-4">
+        Upload a CSV file containing student scores. The CSV should have the following columns in order:
+        <code class="bg-gray-200 p-1 rounded">student_id, subject_name, class_score, exam_score</code>
+    </p>
+    <p class="text-gray-600 mb-4">
+        Example CSV content:
+        <pre class="bg-gray-100 p-3 rounded-md text-sm mt-2">
+student_001,Mathematics,45.00,40.00
+student_002,English,38.50,42.00
+student_001,Science,40.00,35.50
+        </pre>
+    </p>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.csv_file.id_for_label }}">CSV File:</label>
+            {{ form.csv_file }}
+            {% if form.csv_file.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ form.csv_file.errors }}</p>
+            {% endif %}
+            <p class="text-gray-500 text-sm mt-1">{{ form.csv_file.help_text }}</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group">
+                <label for="{{ form.academic_year.id_for_label }}">Academic Year:</label>
+                {{ form.academic_year }}
+                {% if form.academic_year.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.academic_year.errors }}</p>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.term.id_for_label }}">Term:</label>
+                {{ form.term }}
+                {% if form.term.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.term.errors }}</p>
+                {% endif %}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary py-2 px-4">Upload Scores</button>
+    </form>
+</div>
+{% endblock %}
+
+<!-- report_card_app/templates/report_card_remarks_form.html (No major changes) -->
+{% extends 'base.html' %}
+
+{% block title %}Remarks for {{ student.full_name }}{% endblock %}
+
+{% block content %}
+<div class="card p-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Add/Edit Remarks for {{ student.full_name }}</h1>
+    <p class="text-gray-600 mb-4">
+        Academic Year: <span class="font-semibold">{{ current_academic_year.year }}</span> |
+        Term: <span class="font-semibold">{{ current_term.name }}</span>
+    </p>
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group">
+                <label for="{{ form.attendance_days_present.id_for_label }}">Attendance (Days Present):</label>
+                {{ form.attendance_days_present }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.attendance_days_absent.id_for_label }}">Attendance (Days Absent):</label>
+                {{ form.attendance_days_absent }}
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="{{ form.talent_and_interest.id_for_label }}">Talent and Interest:</label>
+            {{ form.talent_and_interest }}
+        </div>
+        {% if is_admin or is_class_teacher %}
+            <div class="form-group">
+                <label for="{{ form.class_teacher_remarks.id_for_label }}">Class Teacher Remarks:</label>
+                {{ form.class_teacher_remarks }}
+            </div>
+        {% endif %}
+        {% if is_admin %}
+            <div class="form-group">
+                <label for="{{ form.headteacher_remarks.id_for_label }}">Headteacher Remarks:</label>
+                {{ form.headteacher_remarks }}
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary py-2 px-4">Save Remarks</button>
+    </form>
+</div>
+{% endblock %}
+
+
+<!-- report_card_app/templates/report_card_individual.html (Updated to reflect Classroom) -->
+<!-- This template is designed for PDF generation, so minimal interactivity/scripts. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Card for {{ student.full_name }}</title>
+    <style>
+        /* Basic CSS for PDF rendering */
+        body {
+            font-family: 'Inter', sans-serif; /* Use a common font for PDF */
+            margin: 0;
+            padding: 20mm; /* A4 margins */
+            font-size: 10pt;
+            line-height: 1.5;
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            max-width: 180mm; /* A4 width minus margins */
+            margin: 0 auto;
+        }
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 0.5em;
+        }
+        h1 { font-size: 18pt; text-align: center; margin-bottom: 1em; }
+        h2 { font-size: 14pt; margin-top: 1.5em; }
+        h3 { font-size: 12pt; margin-top: 1em; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1em;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .header, .footer {
+            text-align: center;
+            margin-bottom: 1em;
+        }
+        .school-logo {
+            max-width: 80px;
+            max-height: 80px;
+            float: left;
+            margin-right: 15px;
+        }
+        .school-details {
+            overflow: hidden; /* Clear float */
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .student-image {
+            max-width: 100px;
+            max-height: 100px;
+            float: right;
+            margin-left: 15px;
+            border: 1px solid #eee;
+        }
+        .section {
+            margin-bottom: 1.5em;
+            clear: both;
+        }
+        .section p {
+            margin-bottom: 0.5em;
+        }
+        .signature-block {
+            margin-top: 2em;
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+        .signature-item {
+            width: 45%;
+            text-align: center;
+            border-top: 1px solid #333;
+            padding-top: 5px;
+            margin-top: 20px;
+        }
+        .signature-image {
+            max-width: 150px;
+            max-height: 50px;
+            display: block;
+            margin: 0 auto 5px auto;
+        }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: bold; }
+        .mb-1 { margin-bottom: 0.5em; }
+        .mb-2 { margin-bottom: 1em; }
+        .mb-3 { margin-bottom: 1.5em; }
+        .mt-1 { margin-top: 0.5em; }
+        .mt-2 { margin-top: 1em; }
+        .mt-3 { margin-top: 1.5em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="school-details">
+            {% if school.logo %}
+                <img src="{{ school.logo.path }}" alt="{{ school.name }} Logo" class="school-logo">
+            {% endif %}
+            <h1 style="font-size: 20pt; margin-bottom: 5px;">{{ school.name|upper }}</h1>
+            <p style="font-size: 10pt; margin-top: 0;">{{ school.address }}</p>
+            <h2 style="font-size: 16pt; margin-top: 15px;">STUDENT REPORT CARD</h2>
+            <p class="font-bold">Academic Year: {{ academic_year.year }} | Term: {{ term.name }}</p>
+        </div>
+
+        <div class="section" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 20px;">
+            <h3 style="text-align: center; margin-bottom: 10px;">STUDENT DETAILS</h3>
+            {% if student.student_image %}
+                <img src="{{ student.student_image.path }}" alt="{{ student.full_name }}'s Image" class="student-image">
+            {% endif %}
+            <p><strong>Name of Student:</strong> {{ student.full_name }}</p>
+            <p><strong>Student ID:</strong> {{ student.student_id }}</p>
+            <p><strong>Grade Level:</strong> {{ classroom_grade_level_name }}</p> {# Changed #}
+            <p><strong>Classroom:</strong> {{ classroom_name }}</p> {# New #}
+            <p><strong>Gender:</strong> {{ student.gender }}</p>
+            <p><strong>Date of Vacation:</strong> {{ date_of_vacation|date:"F j, Y"|default:"N/A" }}</p>
+            <p><strong>Date of Reopening:</strong> {{ date_of_reopening|date:"F j, Y"|default:"N/A" }}</p>
+            <p><strong>Learner's Average Score:</strong> {{ learners_average_score }}%</p>
+            <p><strong>Position in Class:</strong> {{ position_in_class }}</p>
+        </div>
+
+        <div class="section">
+            <h3>SUBJECT PERFORMANCE</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Class Score (50%)</th>
+                        <th>Exams Score (50%)</th>
+                        <th>Total Score</th>
+                        <th>Grade</th>
+                        <th>Remarks</th>
+                        <th>Position in Subject</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for score in student_scores %}
+                    <tr>
+                        <td>{{ score.subject.name }}</td>
+                        <td>{{ score.class_score }}</td>
+                        <td>{{ score.exam_score }}</td>
+                        <td>{{ score.total_score }}</td>
+                        <td>{{ score.grade }}</td>
+                        <td>{{ score.remarks }}</td>
+                        <td>{{ score.subject_position }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">No scores available for this student in this term.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>ADDITIONAL INFORMATION</h3>
+            <p><strong>Attendance (Days Present):</strong> {{ remarks.attendance_days_present|default:"N/A" }}</p>
+            <p><strong>Attendance (Days Absent):</strong> {{ remarks.attendance_days_absent|default:"N/A" }}</p>
+            <p><strong>Talent and Interest:</strong> {{ remarks.talent_and_interest|default:"N/A" }}</p>
+            <p><strong>Class Teacher's Remarks:</strong> {{ remarks.class_teacher_remarks|default:"N/A" }}</p>
+            <p><strong>Headteacher's Remarks:</strong> {{ remarks.headteacher_remarks|default:"N/A" }}</p>
+        </div>
+
+        <div class="signature-block">
+            <div class="signature-item">
+                {% if remarks.class_teacher_signature and remarks.class_teacher_signature.signature_image %}
+                    <img src="{{ remarks.class_teacher_signature.signature_image.path }}" alt="Class Teacher Signature" class="signature-image">
+                {% endif %}
+                <p class="font-bold">{{ remarks.class_teacher_signature.user.get_full_name|default:"N/A" }}</p>
+                <p>Class Teacher Name & Signature</p>
+            </div>
+            <div class="signature-item">
+                {% if remarks.headteacher_signature and remarks.headteacher_signature.signature_image %}
+                    <img src="{{ remarks.headteacher_signature.signature_image.path }}" alt="Headteacher Signature" class="signature-image">
+                {% endif %}
+                <p class="font-bold">{{ remarks.headteacher_signature.user.get_full_name|default:"N/A" }}</p>
+                <p>Headteacher Name & Signature</p>
+            </div>
+        </div>
+
+        <div class="footer mt-3">
+            <p style="font-size: 8pt; color: #666;">Generated by the Student Report Card System.</p>
+        </div>
+    </div>
+</body>
+</html>
+
+<!-- report_card_app/templates/report_card_class.html (Updated to reflect Classroom) -->
+<!-- This template is designed for PDF generation, showing multiple report cards. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Report Cards - {{ classroom.grade_level.name }} {{ classroom.name }}</title> {# Changed #}
+    <style>
+        /* Basic CSS for PDF rendering */
+        body {
+            font-family: 'Inter', sans-serif; /* Use a common font for PDF */
+            margin: 0;
+            padding: 10mm; /* Smaller margins for class reports */
+            font-size: 9pt;
+            line-height: 1.4;
+            color: #333;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+        .report-card-container {
+            width: 100%;
+            max-width: 190mm; /* A4 width minus margins */
+            margin: 0 auto 15mm auto; /* Margin between report cards */
+            border: 1px solid #ccc;
+            padding: 10mm;
+            box-sizing: border-box;
+        }
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 0.5em;
+        }
+        h1 { font-size: 16pt; text-align: center; margin-bottom: 0.5em; }
+        h2 { font-size: 12pt; margin-top: 1em; }
+        h3 { font-size: 10pt; margin-top: 0.8em; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0.8em;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 5px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .school-header {
+            text-align: center;
+            margin-bottom: 1em;
+        }
+        .school-logo {
+            max-width: 60px;
+            max-height: 60px;
+            float: left;
+            margin-right: 10px;
+        }
+        .school-details-text {
+            overflow: hidden;
+            text-align: center;
+        }
+        .student-image {
+            max-width: 80px;
+            max-height: 80px;
+            float: right;
+            margin-left: 10px;
+            border: 1px solid #eee;
+        }
+        .section {
+            margin-bottom: 1em;
+            clear: both;
+        }
+        .section p {
+            margin-bottom: 0.3em;
+        }
+        .signature-block {
+            margin-top: 1.5em;
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+        .signature-item {
+            width: 45%;
+            text-align: center;
+            border-top: 1px solid #333;
+            padding-top: 3px;
+            margin-top: 15px;
+        }
+        .signature-image {
+            max-width: 100px;
+            max-height: 40px;
+            display: block;
+            margin: 0 auto 3px auto;
+        }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: bold; }
+    </style>
+</head>
+<body>
+    {% for data in report_cards_data %}
+        <div class="report-card-container">
+            <div class="school-header">
+                {% if school.logo %}
+                    <img src="{{ school.logo.path }}" alt="{{ school.name }} Logo" class="school-logo">
+                {% endif %}
+                <div class="school-details-text">
+                    <h1 style="font-size: 14pt;">{{ school.name|upper }}</h1>
+                    <p style="font-size: 8pt;">{{ school.address }}</p>
+                    <h2 style="font-size: 12pt; margin-top: 5px;">STUDENT REPORT CARD</h2>
+                    <p class="font-bold">Academic Year: {{ academic_year.year }} | Term: {{ term.name }}</p>
+                    <p class="font-bold">Grade Level: {{ classroom.grade_level.name }} | Classroom: {{ classroom.name }}</p> {# Changed #}
+                </div>
+            </div>
+
+            <div class="section" style="border: 1px solid #ddd; padding: 8px; margin-bottom: 15px;">
+                <h3 style="text-align: center; margin-bottom: 8px;">STUDENT DETAILS</h3>
+                {% if data.student.student_image %}
+                    <img src="{{ data.student.student_image.path }}" alt="{{ data.student.full_name }}'s Image" class="student-image">
+                {% endif %}
+                <p><strong>Name of Student:</strong> {{ data.student.full_name }}</p>
+                <p><strong>Student ID:</strong> {{ data.student.student_id }}</p>
+                <p><strong>Gender:</strong> {{ data.student.gender }}</p>
+                <p><strong>Date of Vacation:</strong> {{ date_of_vacation|date:"F j, Y"|default:"N/A" }}</p>
+                <p><strong>Date of Reopening:</strong> {{ date_of_reopening|date:"F j, Y"|default:"N/A" }}</p>
+                <p><strong>Learner's Average Score:</strong> {{ data.learners_average_score }}%</p>
+                <p><strong>Position in Class:</strong> {{ data.position_in_class }}</p>
+            </div>
+
+            <div class="section">
+                <h3>SUBJECT PERFORMANCE</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Class (50%)</th>
+                            <th>Exams (50%)</th>
+                            <th>Total</th>
+                            <th>Grade</th>
+                            <th>Remarks</th>
+                            <th>Position</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for score in data.student_scores %}
+                        <tr>
+                            <td>{{ score.subject.name }}</td>
+                            <td>{{ score.class_score }}</td>
+                            <td>{{ score.exam_score }}</td>
+                            <td>{{ score.total_score }}</td>
+                            <td>{{ score.grade }}</td>
+                            <td>{{ score.remarks }}</td>
+                            <td>{{ score.subject_position }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">No scores available for this student in this term.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h3>ADDITIONAL INFORMATION</h3>
+                <p><strong>Attendance (Days Present):</strong> {{ data.remarks.attendance_days_present|default:"N/A" }}</p>
+                <p><strong>Attendance (Days Absent):</strong> {{ data.remarks.attendance_days_absent|default:"N/A" }}</p>
+                <p><strong>Talent and Interest:</strong> {{ data.remarks.talent_and_interest|default:"N/A" }}</p>
+                <p><strong>Class Teacher's Remarks:</strong> {{ data.remarks.class_teacher_remarks|default:"N/A" }}</p>
+                <p><strong>Headteacher's Remarks:</strong> {{ data.remarks.headteacher_remarks|default:"N/A" }}</p>
+            </div>
+
+            <div class="signature-block">
+                <div class="signature-item">
+                    {% if data.remarks.class_teacher_signature and data.remarks.class_teacher_signature.signature_image %}
+                        <img src="{{ data.remarks.class_teacher_signature.signature_image.path }}" alt="Class Teacher Signature" class="signature-image">
+                    {% endif %}
+                    <p class="font-bold">{{ data.remarks.class_teacher_signature.user.get_full_name|default:"N/A" }}</p>
+                    <p>Class Teacher Name & Signature</p>
+                </div>
+                <div class="signature-item">
+                    {% if data.remarks.headteacher_signature and data.remarks.headteacher_signature.signature_image %}
+                        <img src="{{ data.remarks.headteacher_signature.signature_image.path }}" alt="Headteacher Signature" class="signature-image">
+                    {% endif %}
+                    <p class="font-bold">{{ data.remarks.headteacher_signature.user.get_full_name|default:"N/A" }}</p>
+                    <p>Headteacher Name & Signature</p>
+                </div>
+            </div>
+        </div>
+        {% if not forloop.last %}
+            <div class="page-break"></div>
+        {% endif %}
+    {% endfor %}
+</body>
+</html>
